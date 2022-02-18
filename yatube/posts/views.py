@@ -38,7 +38,9 @@ def profile(request, username):
         'following': False,
     }
     if request.user.is_authenticated:
-        following = Follow.objects.filter(author=author, user=request.user).exists()
+        following = Follow.objects.filter(
+            author=author, user=request.user
+        ).exists()
         context.update({
             'following': following,
             'user': request.user,
@@ -116,7 +118,9 @@ def post_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
     if request.GET or not form.is_valid():
-        return render(request, 'posts/post_comment.html', {'post': post, 'form': form})
+        return render(
+            request, 'posts/post_comment.html', {'post': post, 'form': form}
+        )
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
@@ -127,7 +131,9 @@ def post_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    authors_list = Follow.objects.filter(user=request.user).values_list('author')
+    authors_list = Follow.objects.filter(
+        user=request.user
+    ).values_list('author')
     posts = Post.objects.filter(author__in=authors_list)
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')

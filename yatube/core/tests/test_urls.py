@@ -5,6 +5,7 @@ from django.urls import reverse
 
 
 class CoreUrlsTests(TestCase):
+    """Проверка корректной работы страницы 404 и её шаблона."""
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -16,4 +17,4 @@ class CoreUrlsTests(TestCase):
 
     def test_404_uses_correct_template(self):
         response = self.guest_client.get('page')
-        self.assertTemplateUsed(response, 'core/404.html', 'Error 404 page template')
+        self.assertTemplateUsed(response, 'core/404.html', 'Error 404 temp.')

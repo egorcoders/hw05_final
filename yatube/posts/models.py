@@ -1,7 +1,3 @@
-from operator import mod
-from statistics import mode
-from tabnanny import verbose
-from turtle import ondrag
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -23,7 +19,7 @@ class Post(models.Model):
                               verbose_name='Группа статей',
                               help_text='Выберите тематическую группу '
                                         'в выпадающем списке по желанию')
-    image = models.ImageField('Картинка', upload_to='posts/', blank=True)  
+    image = models.ImageField('Картинка', upload_to='posts/', blank=True)
 
     class Meta:
         verbose_name = 'Статья'
