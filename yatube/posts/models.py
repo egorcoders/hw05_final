@@ -31,7 +31,7 @@ class Post(models.Model):
 
 
 class Group(models.Model):
-    title = models.CharField(max_length=200, verbose_name='Название  группы',
+    title = models.CharField(max_length=200, verbose_name='Название группы',
                              help_text='Введите название тематической группы')
     slug = models.SlugField(unique=True, verbose_name='Номер группы',
                             help_text='Укажите порядковый номер группы')
