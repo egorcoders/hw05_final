@@ -2,7 +2,6 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
-from django.urls import reverse
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -26,32 +25,20 @@ class PostsUrlsTests(TestCase):
             text='Тестовый пост',
         )
         cls.templates_url_names_public = {
-            'posts/index.html': reverse('posts:index'),
-            'posts/group_list.html': reverse(
-                'posts:group_list',
-                kwargs={'slug': cls.group.slug},
-            ),
-            'posts/profile.html': reverse(
-                'posts:profile',
-                kwargs={'username': cls.author.username},
-            ),
+            'posts/index.html': '/',
+            'posts/group_list.html': f'/group/{cls.group.slug}/',
+            'posts/profile.html': f'/profile/{cls.author.username}/',
         }
 
         cls.templates_url_names_private = {
-            'posts/post_create.html': reverse('posts:post_create')
+            'posts/post_create.html': '/create/'
         }
 
         cls.templates_url_names = {
-            'posts/index.html': reverse('posts:index'),
-            'posts/group_list.html': reverse(
-                'posts:group_list',
-                kwargs={'slug': cls.group.slug},
-            ),
-            'posts/profile.html': reverse(
-                'posts:profile',
-                kwargs={'username': cls.author.username},
-            ),
-            'posts/post_create.html': reverse('posts:post_create'),
+            'posts/index.html': '/',
+            'posts/group_list.html': f'/group/{cls.group.slug}/',
+            'posts/profile.html': f'/profile/{cls.author.username}/',
+            'posts/post_create.html': '/create/',
         }
 
     def setUp(self):
@@ -72,12 +59,7 @@ class PostsUrlsTests(TestCase):
             with self.subTest():
                 response = self.guest_client.get(reverse_name)
                 self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        response = self.guest_client.get(
-            reverse(
-                'posts:post_edit',
-                kwargs={'post_id': self.post.id},
-            )
-        )
+        response = self.guest_client.get(f'/posts/{self.post.id}/edit/')
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_urls_guest_user_public(self):
@@ -101,9 +83,8 @@ class PostsUrlsTests(TestCase):
         """Проверка ссылок авторизованному пользователю - не автору поста."""
         for template, reverse_name in self.templates_url_names.items():
             with self.subTest():
-                if reverse_name == reverse(
-                    'posts:post_edit',
-                    kwargs={'post_id': self.post.id},
+                if reverse_name == self.guest_client.get(
+                    f'/posts/{self.post.id}/edit/'
                 ):
                     response = self.no_author_client.get(reverse_name)
                     self.assertEqual(response.status_code, HTTPStatus.FOUND)

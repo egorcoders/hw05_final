@@ -3,9 +3,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-from posts.forms import PostForm, CommentForm
-from posts.models import Group, Post, Follow
 from django.urls import reverse
+from posts.forms import CommentForm, PostForm
+from posts.models import Follow, Group, Post
 
 User = get_user_model()
 
@@ -29,12 +29,10 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     followers = Follow.objects.filter(author__username=username).count()
-    followings = Follow.objects.filter(user__username=username).count()
     context = {
         'author': author,
         'page_obj': page_obj,
         'followers': followers,
-        'followings': followings,
         'following': False,
     }
     if request.user.is_authenticated:
@@ -117,10 +115,6 @@ def post_edit(request, post_id):
 def post_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
-    if request.GET or not form.is_valid():
-        return render(
-            request, 'posts/post_comment.html', {'post': post, 'form': form}
-        )
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
@@ -131,11 +125,8 @@ def post_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    authors_list = Follow.objects.filter(
-        user=request.user
-    ).values_list('author')
-    posts = Post.objects.filter(author__in=authors_list)
-    paginator = Paginator(posts, 10)
+    posts = Post.objects.filter(author__following__user=request.user)
+    paginator = Paginator(posts, settings.POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
@@ -165,5 +156,6 @@ def profile_unfollow(request, username):
         user=request.user,
         author__username=username,
     )
-    unfollow.delete()
+    if unfollow.exists():
+        unfollow.delete()
     return redirect(reverse('posts:profile', kwargs={'username': username}))
