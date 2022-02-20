@@ -205,7 +205,6 @@ class PostsViewsTests(TestCase):
             'Ошибка изменённого количества комментариев.',
         )
 
-
     def test_post_comment_authorized_user(self):
         """
         Проверка авторизированного пользователя
