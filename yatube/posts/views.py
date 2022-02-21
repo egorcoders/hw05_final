@@ -140,9 +140,8 @@ def follow_index(request):
 def profile_follow(request, username):
     user = request.user
     author = get_object_or_404(User, username=username)
-    following = Follow.objects.filter(author=author, user=user).exists()
-    if user != author and not following:
-        follow = Follow.objects.create(
+    if user != author:
+        follow, created = Follow.objects.get_or_create(
             user=user,
             author=author,
         )

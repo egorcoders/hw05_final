@@ -35,7 +35,11 @@ class PostsModelsTest(TestCase):
             str(self.post): self.post.text[:15],
             str(self.group): self.group.title,
             str(self.comment): self.comment.text[:15],
-            str(self.follow): self.follow.user.username,
+            str(self.follow): (
+                f'{self.follow.user.username} '
+                f'подписан на '
+                f'{self.follow.author.username}'
+            ),
         }
 
         for key, value in list_keys_values.items():
